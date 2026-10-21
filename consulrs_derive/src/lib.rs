@@ -1,5 +1,3 @@
-#[macro_use]
-extern crate synstructure;
 extern crate proc_macro;
 
 mod error;
@@ -29,15 +27,15 @@ fn endpoint_derive(s: synstructure::Structure) -> proc_macro2::TokenStream {
         return Error::new(Span::call_site(), "May only be used on with structs").into_tokens();
     }
 
-    s.gen_impl(quote! {
-        use crate::api::features::{FeaturedEndpoint, Features};
-
-        gen impl FeaturedEndpoint for @Self {
-            fn features(&self) -> Option<Features> {
+    let name = &s.ast().ident;
+    let (impl_generics, type_generics, where_clause) = s.ast().generics.split_for_impl();
+    quote::quote! {
+        impl #impl_generics crate::api::features::FeaturedEndpoint for #name #type_generics #where_clause {
+            fn features(&self) -> Option<crate::api::features::Features> {
                 self.features.clone()
             }
         }
-    })
+    }
 }
 
 synstructure::decl_derive!([QueryEndpoint] => endpoint_derive);

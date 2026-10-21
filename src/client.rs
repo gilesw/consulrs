@@ -110,8 +110,16 @@ impl ConsulClient {
         let http_client = http_client
             .build()
             .map_err(|e| ClientError::RestClientBuildError { source: e })?;
+        Ok(Self::with_http_client(settings, http_client))
+    }
+
+    /// Uses an existing HTTP client without initializing another TLS backend.
+    ///
+    /// The caller configures TLS, timeouts, redirects, proxies, and retries on
+    /// `http_client`. TLS settings in `settings` are not applied to this client.
+    pub fn with_http_client(settings: ConsulClientSettings, http_client: reqwest::Client) -> Self {
         let http = HTTPClient::new(settings.address.as_str(), http_client);
-        Ok(ConsulClient { settings, http })
+        ConsulClient { settings, http }
     }
 }
 

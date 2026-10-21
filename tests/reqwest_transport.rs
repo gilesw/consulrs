@@ -73,9 +73,16 @@ async fn reqwest_013_client_preserves_middleware_and_response_metadata() {
     let mut response = format!("HTTP/1.1 200 OK\r\nContent-Length: {}\r\nX-Consul-Index: 42\r\nX-Consul-KnownLeader: true\r\nConnection: close\r\n\r\n", body.len()).into_bytes();
     response.extend_from_slice(body);
     let (address, server) = serve(response).await;
-    let mut client = ConsulClient::new(settings(address)).unwrap();
-    // This assignment also checks that the public client uses Reqwest 0.13.
-    client.http.http = reqwest::Client::builder().no_proxy().build().unwrap();
+    // An HTTP-only caller needs neither system roots nor a second TLS backend.
+    let tls = rustls::ClientConfig::builder()
+        .with_root_certificates(rustls::RootCertStore::empty())
+        .with_no_client_auth();
+    let http = reqwest::Client::builder()
+        .no_proxy()
+        .tls_backend_preconfigured(tls)
+        .build()
+        .unwrap();
+    let client = ConsulClient::with_http_client(settings(address), http);
     let features = Features {
         mode: Some(ConsistencyMode::CONSISTENT),
         ..Features::default()

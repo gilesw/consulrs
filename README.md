@@ -37,7 +37,9 @@ consulrs = "0.1.0"
 ## HTTP client compatibility
 
 The client uses Reqwest 0.13, Rustify 0.7, and `http` 1.x.
-Custom clients assigned to `ConsulClient.http.http` must use Reqwest 0.13.
+Use `ConsulClient::with_http_client(settings, client)` to supply an existing Reqwest 0.13 client.
+This avoids constructing a second TLS backend. The caller configures transport and TLS policies.
+Custom clients assigned to `ConsulClient.http.http` must also use Reqwest 0.13.
 Custom middleware must use the request and response types from `http` 1.x.
 These public type changes require changes in applications that use older versions.
 

@@ -56,18 +56,24 @@ pub struct TestService {
 
 // Sets up a new test.
 #[allow(dead_code)]
-pub fn new_test() -> Test {
+pub fn new_consul_test() -> Test {
     let mut test = Test::default();
     let consul_config = ConsulServerConfig::builder()
         .port(CONSUL_PORT)
         .version(VERSION.into())
         .build()
         .unwrap();
+    test.register(consul_config);
+    test
+}
+
+#[allow(dead_code)]
+pub fn new_test() -> Test {
+    let mut test = new_consul_test();
     let counting_config = CountingServerConfig::builder()
         .port(COUNTING_PORT)
         .build()
         .unwrap();
-    test.register(consul_config);
     test.register(counting_config);
     test
 }

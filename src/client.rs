@@ -65,7 +65,7 @@ impl ConsulClient {
 
         // Adds CA certificates
         for path in &settings.ca_certs {
-            let content = std::fs::read(&path).map_err(|e| ClientError::FileReadError {
+            let content = std::fs::read(path).map_err(|e| ClientError::FileReadError {
                 source: e,
                 path: path.clone(),
             })?;
@@ -83,12 +83,12 @@ impl ConsulClient {
         // Add client certificate
         if let (Some(cert), Some(key)) = (&settings.client_cert, &settings.client_key) {
             let cert_content =
-                std::fs::read_to_string(&cert).map_err(|e| ClientError::FileReadError {
+                std::fs::read_to_string(cert).map_err(|e| ClientError::FileReadError {
                     source: e,
                     path: cert.clone(),
                 })?;
             let key_content =
-                std::fs::read_to_string(&key).map_err(|e| ClientError::FileReadError {
+                std::fs::read_to_string(key).map_err(|e| ClientError::FileReadError {
                     source: e,
                     path: key.clone(),
                 })?;
@@ -110,8 +110,16 @@ impl ConsulClient {
         let http_client = http_client
             .build()
             .map_err(|e| ClientError::RestClientBuildError { source: e })?;
+        Ok(Self::with_http_client(settings, http_client))
+    }
+
+    /// Uses an existing HTTP client without initializing another TLS backend.
+    ///
+    /// The caller configures TLS, timeouts, redirects, proxies, and retries on
+    /// `http_client`. TLS settings in `settings` are not applied to this client.
+    pub fn with_http_client(settings: ConsulClientSettings, http_client: reqwest::Client) -> Self {
         let http = HTTPClient::new(settings.address.as_str(), http_client);
-        Ok(ConsulClient { settings, http })
+        ConsulClient { settings, http }
     }
 }
 

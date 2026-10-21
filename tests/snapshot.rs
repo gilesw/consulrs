@@ -6,7 +6,7 @@ use test_log::test;
 
 #[test]
 fn test() {
-    let test = common::new_test();
+    let test = common::new_consul_test();
     test.run(|instance| async move {
         let server: ConsulServer = instance.server();
         let client = server.client();

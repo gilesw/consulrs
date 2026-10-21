@@ -11,10 +11,10 @@ pub struct Error(proc_macro2::TokenStream);
 impl Error {
     /// Returns a new instance of [Error] using the given [Span] and message.
     ///
-    /// This uses [quote_spanned!] in order to provide more accurate information
+    /// This uses [quote::quote_spanned!] in order to provide more accurate information
     /// to the compiler about the exact location of the error.
     pub fn new(span: Span, message: &str) -> Error {
-        Error(quote_spanned! { span =>
+        Error(quote::quote_spanned! { span =>
             compile_error!(#message);
         })
     }

@@ -3,7 +3,6 @@ use crate::api::Features;
 use consulrs_derive::QueryEndpoint;
 use derive_builder::Builder;
 use rustify_derive::Endpoint;
-use serde::Serialize;
 use std::fmt::Debug;
 
 /// ## List Service Instances for Service

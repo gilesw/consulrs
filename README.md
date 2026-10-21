@@ -34,6 +34,16 @@ Add `consulrs` as a dependency to your cargo.toml:
 consulrs = "0.1.0"
 ```
 
+## HTTP client compatibility
+
+The client uses Reqwest 0.13, Rustify 0.7, and `http` 1.x.
+Custom clients assigned to `ConsulClient.http.http` must use Reqwest 0.13.
+Custom middleware must use the request and response types from `http` 1.x.
+These public type changes require changes in applications that use older versions.
+
+TLS uses Rustls with platform certificate trust through Reqwest.
+The `ca_certs`, `client_cert`, `client_key`, and `verify` settings remain available.
+
 ## Usage
 
 ### Basic
